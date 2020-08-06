@@ -1,0 +1,44 @@
+---
+# Simple Ansible playbook for install nginx for Centos 7
+- hosts: nodes
+  tasks:
+
+    - name: touch nginx.repo
+      file:
+        state: touch
+        path: "/etc/yum.repos.d/nginx.repo"
+        owner: root
+        group: root
+        mode: '0644'
+
+    - name: fill nginx.repo
+      copy:
+        dest: "/etc/yum.repos.d/nginx.repo"
+        src: "/etc/ansible/src/nginx.repo"
+
+    - name: Update repos
+      yum:
+        name: '*'
+        state: latest
+
+    - name: Install nginx
+      yum:
+        name: nginx
+        state: latest
+
+    - name: Make sure a nginx daemon is enabled and started
+      systemd:
+        name: nginx
+        state: started
+        enabled: yes
+        masked: no
+
+#    - firewalld:
+#        service: http
+#        permanent: yes
+#        state: enabled
+
+    - firewalld:
+        service: https
+        permanent: yes
+        state: enabled
